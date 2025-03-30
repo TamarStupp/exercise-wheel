@@ -23,8 +23,11 @@
             @input="hsl.startHue = Number($event.target.value)" />
           </div>
           <div>
-            <label for="hueJump">hue jump: </label>
-            <input type="number" min="0" max="360" v-model="hsl.hueJump" />
+              <button id="plus-huejump" @click="hsl.hueJump++">+</button>
+              <label for="hueJump">hue jump: </label>
+              <span> {{ hsl.hueJump }}</span>
+              <button id="minus-huejump" @click="hsl.hueJump = Math.max(hsl.hueJump - 1, 0)">-</button>
+              <button @click="hsl.hueJump = 0">reset</button>
           </div>
         </div>
         
