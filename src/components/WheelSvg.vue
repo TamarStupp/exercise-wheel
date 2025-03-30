@@ -6,15 +6,23 @@
             :d="
             `M ${cx}, ${cy}
             h ${radius}
-            A ${radius} ${radius} 0 0 1 ${wantedX} ${wantedY}
+            A ${radius} ${radius} 0 ${Number(numberOfSlices < 2)} 1 ${wantedX} ${wantedY}
             L ${cx} ${cy}
             `" stroke-width="1" stroke="black" ></path>
             </defs>
-            <circle :cx="cx" :cy="cy" :r="radius" fill="grey"/>
-            <use href="#slice" 
-            v-for="n in numberOfSlices"
-            :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`"
-            :fill="chooseColor(n)" :key="`${colorMode}-${hslObj.startHue}-${n}`"></use>
+            <!-- colorMode: array -->
+             <g v-if="colorMode === 'array' && colors">
+                 <use href="#slice" 
+                 v-for="n in numberOfSlices"
+                 :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`"
+                 :fill="colors[(n - 1) % (colors.length)]"></use>
+             </g>
+             <g v-else>
+                 <use href="#slice" 
+                 v-for="n in numberOfSlices"
+                 :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`"
+                 :fill="`hsl(${this.hslObj.hueJump * (n - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
+             </g>
         </svg>
 </template>
 
@@ -60,16 +68,6 @@ export default {
             cx: 0,
         }
     },
-    methods: {
-        chooseColor(n) {
-            console.log('choose color');
-            if (this.colors && this.colorMode === 'array') {
-                    return(this.colors[(n - 1) % (this.colors.length)])
-            } else {
-                return `hsl(${this.hslObj.hueJump * (n - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`;
-            }
-        }
-    },
     computed: {
         radianPerSlice() {
             return (2 * Math.PI / this.numberOfSlices)
@@ -85,9 +83,9 @@ export default {
                 startHue: this.hsl.startHue || 0,
                 hueJump: this.hsl.hueJump || 22,
                 saturation: this.hsl.saturation || 95,
-                lightness: this.hsl.lightness || 60
+                lightness: this.hsl.lightness || 60 
             }
-            }
+        },
     }
 }
 </script>

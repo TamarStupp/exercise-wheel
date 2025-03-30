@@ -2,26 +2,30 @@
   <div class="wrapper">
     <WheelSvg
       :hsl="hsl"
-      :colors="['red', 'yellow']"
+      :colors="['red', 'yellow',]"
       :colorMode="colorMode"
       :numberOfSlices="numberOfSlices"
     ></WheelSvg>
             <div>
               <button id="plus" @click="numberOfSlices++">+</button>
               <span> {{ numberOfSlices }}</span>
-              <button id="minus" @click="numberOfSlices--">-</button>
+              <button id="minus" @click="numberOfSlices = Math.max(numberOfSlices - 1, 0)">-</button>
+              <button @click="numberOfSlices = 1">reset</button>
           </div>
         <div>
-          <input type="checkbox" name="isHSL" @input="onSwitch"/>
+          <input type="checkbox" name="isHSL" @input="onSwitch" checked/>
           <label for="isHSL">Is HSL? </label>
         </div>
-        <div>
-          <label for="hueStart">hue start: </label>
-          <input type="range" min="0" max="360" v-model="hsl.startHue" />
-        </div>
-        <div>
-          <label for="hueJump">hue jump: </label>
-          <input type="number" min="0" max="360" v-model="hsl.hueJump" />
+        <div class="hsl-btns" :style="`visibility: ${colorMode === 'hsl' ? 'visible' : 'hidden'}`">
+          <div>
+            <label for="hueStart">hue start: </label>
+            <input type="range" min="0" max="360" :value="hsl.startHue"
+            @input="hsl.startHue = Number($event.target.value)" />
+          </div>
+          <div>
+            <label for="hueJump">hue jump: </label>
+            <input type="number" min="0" max="360" v-model="hsl.hueJump" />
+          </div>
         </div>
         
   </div>
@@ -34,10 +38,10 @@ import WheelSvg from "./components/WheelSvg.vue"
     components: { WheelSvg },
     data() {
       return {
-        colorMode: 'array',
+        colorMode: 'hsl',
         numberOfSlices: 8,
         hsl: {
-          startHue: 10,
+          startHue: 120,
           hueJump: 5
         }
       }
@@ -83,5 +87,9 @@ import WheelSvg from "./components/WheelSvg.vue"
         height: 48px;
         border-radius: 2rem 2rem;
         cursor: pointer;
+    }
+
+    .hsl-btns {
+      display: contents;
     }
 </style>
