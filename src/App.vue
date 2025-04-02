@@ -1,36 +1,38 @@
 <template id="app">
   <div class="wrapper">
-    <WheelSvg
-      :hsl="hsl"
-      :colors="['red', 'yellow',]"
-      :colorMode="colorMode"
-      :numberOfSlices="numberOfSlices"
-    ></WheelSvg>
-            <div>
-              <button id="plus" @click="numberOfSlices++">+</button>
-              <span> {{ numberOfSlices }}</span>
-              <button id="minus" @click="numberOfSlices = Math.max(numberOfSlices - 1, 0)">-</button>
-              <button @click="numberOfSlices = 1">reset</button>
-          </div>
-        <div>
-          <input type="checkbox" name="isHSL" @input="onSwitch" checked/>
-          <label for="isHSL">Is HSL? </label>
-        </div>
-        <div class="hsl-btns" :style="`visibility: ${colorMode === 'hsl' ? 'visible' : 'hidden'}`">
-          <div>
-            <label for="hueStart">hue start: </label>
-            <input type="range" min="0" max="360" :value="hsl.startHue"
-            @input="hsl.startHue = Number($event.target.value)" />
-          </div>
-          <div>
-              <button id="plus-huejump" @click="hsl.hueJump++">+</button>
-              <label for="hueJump">hue jump: </label>
-              <span> {{ hsl.hueJump }}</span>
-              <button id="minus-huejump" @click="hsl.hueJump = Math.max(hsl.hueJump - 1, 0)">-</button>
-              <button @click="hsl.hueJump = 0">reset</button>
-          </div>
-        </div>
-        
+    <div class="wheel-wrapper spin">
+      <WheelSvg
+        :hsl="hsl"
+        :colors="['red', 'yellow',]"
+        :colorMode="colorMode"
+        :numberOfSlices="numberOfSlices"
+      ></WheelSvg>
+    </div>
+    <!-- <div>
+      <button id="plus" @click="numberOfSlices++">+</button>
+      <span> {{ numberOfSlices }}</span>
+      <button id="minus" @click="numberOfSlices = Math.max(numberOfSlices - 1, 0)">-</button>
+      <button @click="numberOfSlices = 1">reset</button>
+  </div>
+  <div>
+    <input type="checkbox" name="isHSL" @input="onSwitch" checked/>
+    <label for="isHSL">Is HSL? </label>
+  </div>
+  <div class="hsl-btns" :style="`visibility: ${colorMode === 'hsl' ? 'visible' : 'hidden'}`">
+    <div>
+      <label for="hueStart">hue start: </label>
+      <input type="range" min="0" max="360" :value="hsl.startHue"
+      @input="hsl.startHue = Number($event.target.value)" />
+    </div>
+    <div>
+        <button id="plus-huejump" @click="hsl.hueJump++">+</button>
+        <label for="hueJump">hue jump: </label>
+        <span> {{ hsl.hueJump }}</span>
+        <button id="minus-huejump" @click="hsl.hueJump = Math.max(hsl.hueJump - 1, 0)">-</button>
+        <button @click="hsl.hueJump = 0">reset</button>
+    </div>
+  </div> -->
+    <button id="spin" @click="spin">Spin!</button>
   </div>
 </template>
 
@@ -46,7 +48,8 @@ import WheelSvg from "./components/WheelSvg.vue"
         hsl: {
           startHue: 120,
           hueJump: 5
-        }
+        },
+        rotationAngle: 2 * Math.PI / 16,
       }
     },
     methods: {
@@ -56,16 +59,19 @@ import WheelSvg from "./components/WheelSvg.vue"
         } else {
           this.colorMode = "hsl";
         }
+      },
+      spin() {
+        const randomInt = Math.floor(Math.random() * this.numberOfSlices);
+        const randomFullSpins = Math.floor(Math.random() * (4 - 2) + 1);
+        this.rotationAngle += 2*Math.PI * randomFullSpins;
+        this.rotationAngle += randomInt * this.radianPerSlice;
       }
     },
-    // computed: {
-    //   hsl() {
-    //     return {
-    //       startHue: this.startHue,
-    //       hueJump: this.hueJump
-    //     }
-    //   }
-    // }
+    computed: {
+      radianPerSlice() {
+        return (2 * Math.PI / this.numberOfSlices)
+      },
+    }
   }
 
 </script>
@@ -94,5 +100,10 @@ import WheelSvg from "./components/WheelSvg.vue"
 
     .hsl-btns {
       display: contents;
+    }
+
+    .spin {
+      transform: rotate(v-bind("`${rotationAngle}rad`"));
+      transition: transform 1s ease-in;
     }
 </style>

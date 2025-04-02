@@ -6,17 +6,25 @@
         :d="
         `M ${cx}, ${cy}
         h ${radius}
-        A ${radius} ${radius} 0 ${Number(numberOfSlices < 2)} 1 ${wantedX} ${wantedY}
+        A ${radius} ${radius} 0 ${Number(numberOfSlices < 2)} 1 ${wantedX} ${lowerLine(wantedX)}
         L ${cx} ${cy}
         `" stroke-width="1" stroke="black" ></path>
 
+        <clipPath id="myClip">
+            <!--
+              Everything outside the circle will be
+              clipped and therefore invisible.
+            -->
+            <circle cx="40" cy="35" r="35" />
+          </clipPath>
+
         <path id="textPath"
             :d="`M ${cx}, ${cy}
-                L ${textPathX} ${textPathY}
-                M ${cx}, ${cy - lineHeight}
-                L ${textPathX} ${textPathY - lineHeight}
-                M ${cx}, ${cy - 2*lineHeight}
-                L ${textPathX} ${textPathY - 2*lineHeight}`" stroke="pink" stroke-width="2"/>
+                L ${textPathX} ${f(textPathX)}
+                M ${textPathXMoved1}, ${g(textPathXMoved1, lineHeight)}
+                L ${textPathX + lineHeight} ${g(textPathX + lineHeight ,lineHeight)}
+                M ${textPathXMoved2}, ${g(textPathXMoved2, lineHeight * 2)}
+                L ${textPathX + lineHeight} ${g(textPathX + lineHeight , 2*lineHeight)}`" stroke="pink" stroke-width="2"/>
         </defs>
         <!-- colorMode: array -->
          <g v-if="colorMode === 'array' && colors">
@@ -26,12 +34,14 @@
              :fill="colors[(n - 1) % (colors.length)]"></use>
          </g>
          <g v-else>
-            <g v-for="n in numberOfSlices"
+            <!-- v-for="n in numberOfSlices" -->
+            <g 
+            v-for="n in numberOfSlices"
             :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
                 <use href="#slice" 
                 :fill="`hsl(${this.hslObj.hueJump * (n - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
                 <text :style="`font-size: clamp(0.5rem, ${radiusInPx/text.length}px, 2rem)`" fill="black"> 
-                        <textPath href="#textPath">{{  text }} </textPath>
+                        <textPath startOffset="10"  href="#textPath">{{  text }} </textPath>
                     </text>
                 <!-- <use href="#textPath"></use> -->
             </g>
@@ -84,6 +94,17 @@ data() {
         lineHeight: -6
     }
 },
+methods: {
+    f(x) {
+        return Math.tan(this.radianPerSlice / 2) * x + this.cy - this.cx * Math.tan(this.radianPerSlice / 2)
+    },
+    g(x, moveDown) {
+        return this.f(x) - moveDown;
+    },
+    lowerLine(x) {
+        return Math.tan(this.radianPerSlice) * x + this.cy - this.cx * Math.tan(this.radianPerSlice)
+    },
+},
 computed: {
     radianPerSlice() {
         return (2 * Math.PI / this.numberOfSlices)
@@ -111,6 +132,12 @@ computed: {
     textPathY () {
         return Math.sin(this.radianPerSlice / 2) * this.radius + this.cy;
     },
+    textPathXMoved1() {
+        return this.cx - this.lineHeight/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2))
+    },
+    textPathXMoved2() {
+        return this.cx - this.lineHeight * 2/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2))
+    }
     // lineHeight() {
     //     if (window.innerWidth > 1024) {
     //         return 25;
