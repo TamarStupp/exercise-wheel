@@ -36,12 +36,12 @@
          <g v-else>
             <!-- v-for="n in numberOfSlices" -->
             <g 
-            v-for="n in numberOfSlices"
-            :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
+            v-for="(value, index) in entriesArray"
+            :transform="`rotate( ${(index)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
                 <use href="#slice" 
-                :fill="`hsl(${this.hslObj.hueJump * (n - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
-                <text :style="`font-size: clamp(0.5rem, ${radiusInPx/text.length}px, 2rem)`" fill="black"> 
-                        <textPath startOffset="10"  href="#textPath">{{  text }} </textPath>
+                :fill="`hsl(${this.hslObj.hueJump * (index - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
+                <text :style="`font-size: clamp(0.5rem, ${radiusInPx/(value.length * 2)}px, 2rem)`" class="txt" fill="black"> 
+                        <textPath startOffset="10"  href="#textPath">{{  value }} </textPath>
                     </text>
                 <!-- <use href="#textPath"></use> -->
             </g>
@@ -78,9 +78,9 @@ export default {
     "colors": {type: Array,
                 default: ["red", "orange", "yellow", "green", "blue", "purple", "pink"]
     },
-    "numberOfSlices": {
+    "entriesArray": {
         required: true,
-        type: Number
+        type: Array
     }
         
 },
@@ -89,7 +89,6 @@ data() {
         radius: 49,
         cy: 0,
         cx: 0,
-        text: 'hi gffds fdasaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         svgWidth: 0,
         lineHeight: -6
     }
@@ -106,6 +105,9 @@ methods: {
     },
 },
 computed: {
+    numberOfSlices() {
+        return this.entriesArray.length;
+    },
     radianPerSlice() {
         return (2 * Math.PI / this.numberOfSlices)
     },
@@ -157,6 +159,10 @@ mounted () {
 .svg {
     height: 13rem;
     aspect-ratio: 1/1;
+}
+
+.txt {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 </style>
