@@ -5,7 +5,7 @@
         :hsl="hsl"
         :colors="['red', 'yellow',]"
         :colorMode="colorMode"
-        :numberOfSlices="numberOfSlices"
+        :entriesArray="entriesArray"
       ></WheelSvg>
     </div>
     <!-- <div>
@@ -44,10 +44,10 @@ import WheelSvg from "./components/WheelSvg.vue"
     data() {
       return {
         colorMode: 'hsl',
-        numberOfSlices: 8,
+        entriesArray: ['אימון 1', "אימון 2", "אימון 3", "אימון 5"],
         hsl: {
-          startHue: 120,
-          hueJump: 5
+          startHue: 20,
+          hueJump: 23
         },
         rotationAngle: 2 * Math.PI / 16,
       }
@@ -61,7 +61,7 @@ import WheelSvg from "./components/WheelSvg.vue"
         }
       },
       spin() {
-        const randomInt = Math.floor(Math.random() * this.numberOfSlices);
+        const randomInt = Math.floor(Math.random() * this.entriesArray.length);
         const randomFullSpins = Math.floor(Math.random() * (4 - 2) + 1);
         this.rotationAngle += 2*Math.PI * randomFullSpins;
         this.rotationAngle += randomInt * this.radianPerSlice;
@@ -69,7 +69,7 @@ import WheelSvg from "./components/WheelSvg.vue"
     },
     computed: {
       radianPerSlice() {
-        return (2 * Math.PI / this.numberOfSlices)
+        return (2 * Math.PI / this.entriesArray.length)
       },
     }
   }
@@ -104,6 +104,7 @@ import WheelSvg from "./components/WheelSvg.vue"
 
     .spin {
       transform: rotate(v-bind("`${rotationAngle}rad`"));
-      transition: transform 1s ease-in;
+      transition: transform 3s ease-in;
+    
     }
 </style>
