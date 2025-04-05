@@ -1,6 +1,6 @@
 <template>
     <!-- last two values in viewbox are height and width -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="svg" id="wheelSvg" viewBox="-50 -50 100 100" fill="none" ref="svg">
+    <svg xmlns="http://www.w3.org/2000/svg" class="svg" id="wheelSvg" viewBox="-50 -50 102 102" fill="none" ref="svg"> 
         <defs>
             <path id="slice"
         :d="
@@ -19,33 +19,39 @@
           </clipPath>
 
         <path id="textPath"
-            :d="`M ${cx}, ${cy}
-                L ${textPathX} ${f(textPathX)}
+            :d="`
+                M ${cx + offSet}, ${cy + offSet}
+                L ${textPathX - offSet} ${f(textPathX)}
                 M ${textPathXMoved1}, ${g(textPathXMoved1, lineHeight)}
-                L ${textPathX + lineHeight} ${g(textPathX + lineHeight ,lineHeight)}
+                L ${lineTo1X} ${g(lineTo1X ,lineHeight)}
                 M ${textPathXMoved2}, ${g(textPathXMoved2, lineHeight * 2)}
-                L ${textPathX + lineHeight} ${g(textPathX + lineHeight , 2*lineHeight)}`" stroke="pink" stroke-width="2"/>
+                L ${lineTo2X} ${g(lineTo2X , 2 * lineHeight)}
+                `" stroke="pink" stroke-width="2"/>
         </defs>
         <!-- colorMode: array -->
-         <g v-if="colorMode === 'array' && colors">
+         <g v-if="colorMode === 'array' && colors" class="spin">
              <use href="#slice" 
              v-for="n in numberOfSlices"
              :transform="`rotate( ${(n)*(360/numberOfSlices)}, ${cx}, ${cy} )`"
              :fill="colors[(n - 1) % (colors.length)]"></use>
          </g>
-         <g v-else>
+         <g v-else class="spin">
             <!-- v-for="n in numberOfSlices" -->
             <g 
             v-for="(value, index) in entriesArray"
             :transform="`rotate( ${(index)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
                 <use href="#slice" 
                 :fill="`hsl(${this.hslObj.hueJump * (index - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
-                <text :style="`font-size: clamp(0.5rem, ${radiusInPx/(value.length * 2)}px, 2rem)`" class="txt" fill="black"> 
+                <text direction="ltr" :style="`font-size: clamp(0.3rem, ${radiusInPx/(value.length * 2)}px, ${2 - 0.1 * numberOfSlices}rem)`" class="txt" fill="black"> 
                         <textPath startOffset="10"  href="#textPath">{{  value }} </textPath>
                     </text>
+                    <!-- <circle r="2" fill="black" 
+                    :cx="Math.cos(radianPerSlice / 2 - Math.asin(lineHeight/radius)) * radius + cx" 
+                    :cy="Math.sin(radianPerSlice / 2 - Math.asin(lineHeight/radius)) * radius + cy"></circle> -->
                 <!-- <use href="#textPath"></use> -->
             </g>
          </g>
+         <path :d="`M${0 + 7.5/2} ${50 - 7.5}v-6l-3.5 -5.5l-4 5.5v15h7.5Z`" fill="#D9D9D9" stroke="black"/>
     </svg>
 </template>
 
@@ -81,6 +87,9 @@ export default {
     "entriesArray": {
         required: true,
         type: Array
+    },
+    "rotationAngle": {
+        type: Number
     }
         
 },
@@ -90,7 +99,8 @@ data() {
         cy: 0,
         cx: 0,
         svgWidth: 0,
-        lineHeight: -6
+        lineHeight: 6,
+        offSet: 5
     }
 },
 methods: {
@@ -126,7 +136,7 @@ computed: {
         }
     },
     radiusInPx() {
-        return (this.radius * this.svgWidth)/100;
+        return (this.radius * this.svgWidth)/102;
     },
     textPathX () {
         return Math.cos(this.radianPerSlice / 2) * this.radius + this.cx;
@@ -135,18 +145,20 @@ computed: {
         return Math.sin(this.radianPerSlice / 2) * this.radius + this.cy;
     },
     textPathXMoved1() {
-        return this.cx - this.lineHeight/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2))
+        // return this.cx - this.lineHeight/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2));
+        return this.cx + this.offSet + (this.lineHeight - this.cy)/Math.tan(this.radianPerSlice / 2);
     },
     textPathXMoved2() {
-        return this.cx - this.lineHeight * 2/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2))
+        // for english
+        // return this.cx - this.lineHeight * 2/(Math.tan(this.radianPerSlice) - Math.tan(this.radianPerSlice / 2))
+        return this.cx + this.offSet + (this.lineHeight * 2 - this.cy)/Math.tan(this.radianPerSlice / 2);
+    },
+    lineTo1X() {
+        return Math.cos(this.radianPerSlice / 2 - Math.asin(this.lineHeight/this.radius)) * this.radius + this.cx - this.offSet;
+    },
+    lineTo2X() {
+        return Math.cos(this.radianPerSlice / 2 - Math.asin((this.lineHeight * 2)/this.radius)) * this.radius + this.cx - this.offSet;
     }
-    // lineHeight() {
-    //     if (window.innerWidth > 1024) {
-    //         return 25;
-    //     } else {
-    //         return 50;
-    //     }
-    // }
 },
 mounted () {
     this.svgWidth = Number(this.$refs.svg.getBoundingClientRect().width)
@@ -163,6 +175,11 @@ mounted () {
 
 .txt {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.spin {
+    transform: rotate(v-bind("`${rotationAngle}rad`"));
+    transition: transform 3s ease-in-out;
 }
 
 </style>
