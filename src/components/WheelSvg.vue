@@ -40,6 +40,8 @@
             <g 
             v-for="(value, index) in entriesArray"
             :transform="`rotate( ${(index)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
+            v-for="(value, index) in entriesArray"
+            :transform="`rotate( ${(index)*(360/numberOfSlices)}, ${cx}, ${cy} )`">
                 <use href="#slice" 
                 :fill="`hsl(${this.hslObj.hueJump * (index - 1) + this.hslObj.startHue}deg ${this.hslObj.saturation}% ${this.hslObj.lightness}%)`"></use>
                 <text direction="ltr" :style="`font-size: clamp(0.3rem, ${radiusInPx/(value.length * 2)}px, ${2 - 0.1 * numberOfSlices}rem)`" class="txt" fill="black"> 
@@ -115,6 +117,9 @@ methods: {
     },
 },
 computed: {
+    numberOfSlices() {
+        return this.entriesArray.length;
+    },
     numberOfSlices() {
         return this.entriesArray.length;
     },
