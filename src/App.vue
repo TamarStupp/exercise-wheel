@@ -60,11 +60,10 @@ export default {
 			const randomFullSpins = Math.floor(Math.random() * (4 - 2) + 1);
 			this.rotationAngle += 2 * Math.PI * randomFullSpins;
 			const radians = this.rotationAngle % (2*Math.PI);
-			if ((radians - (Math.PI / 2 - this.radianPerSlice / 2)) % this.entriesArray.length === 0) {
-				this.rotationAngle += randomInt * this.radianPerSlice;
-			} else {
+			this.rotationAngle += randomInt * this.radianPerSlice;
+			if ((this.rotationAngle - Math.PI/2 - this.radianPerSlice/2) % (this.radianPerSlice) !== 0) {
 				console.log('hi');
-				this.rotationAngle += randomInt * this.radianPerSlice + this.entriesArray.length - ((radians - (Math.PI / 2 - this.radianPerSlice / 2)) % this.entriesArray.length === 0);
+				this.rotationAngle += ((this.radianPerSlice) - (this.rotationAngle - Math.PI/2 - this.radianPerSlice/2) % (this.radianPerSlice));
 			}
 		}
 	},
