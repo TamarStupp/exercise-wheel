@@ -23,7 +23,7 @@ export default {
 			appData: [
 				{
 					name: "כתפיים",
-					items: [""]
+					items: ["1", "2", "3"]
 				},
 				{
 					name: "חזה",

@@ -92,7 +92,8 @@ export default {
     },
     "rotationAngle": {
         type: Number
-    }
+    },
+    "transitionTime":{ type: Number}
         
 },
 data() {
@@ -184,7 +185,7 @@ mounted () {
 
 .spin {
     transform: rotate(v-bind("`${rotationAngle}rad`"));
-    transition: transform 3s ease-in-out;
+    transition: transform v-bind("`${transitionTime}s`") ease-in-out;
 }
 
 </style>
